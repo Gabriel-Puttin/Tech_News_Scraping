@@ -1,9 +1,22 @@
-# Requisito 1
+import requests
+import time
+
+
 def fetch(url):
-    """Seu código deve vir aqui xx"""
+    try:
+        response = requests.get(
+            url,
+            headers={"user-agent": "Fake user-agent"},
+            timeout=3
+            )
+        time.sleep(1)
+        if response.status_code != 200:
+            return None
+    except requests.ReadTimeout:
+        return None
+    return response.text
 
 
-# Requisito 2
 def scrape_updates(html_content):
     """Seu código deve vir aqui"""
 
