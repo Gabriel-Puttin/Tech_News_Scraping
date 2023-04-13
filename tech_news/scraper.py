@@ -3,13 +3,20 @@ import time
 from bs4 import BeautifulSoup
 
 
+def formated_str(phrase: str) -> str:
+    result = ""
+    if phrase[-1] == " ":
+        result = phrase[:-1]
+    else:
+        result = phrase
+    return result.replace("\xa0", "")
+
+
 def fetch(url):
     try:
         response = requests.get(
-            url,
-            headers={"user-agent": "Fake user-agent"},
-            timeout=3
-            )
+            url, headers={"user-agent": "Fake user-agent"}, timeout=3
+        )
         time.sleep(1)
         if response.status_code != 200:
             return None
@@ -35,7 +42,27 @@ def scrape_next_page_link(html_content):
 
 # Requisito 4
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
+    soup = BeautifulSoup(html_content, "html.parser")
+    news_report = dict()
+    news_report["url"] = soup.find("div", {"class": "pk-share-buttons-wrap"})[
+        "data-share-url"
+    ]
+    news_report["title"] = formated_str(
+        soup.find("h1", {"class": "entry-title"}).string
+    )
+    news_report["timestamp"] = soup.find("li", {"class": "meta-date"}).string
+    news_report["writer"] = soup.find("a", {"class": "url fn n"}).string
+    data_ul = soup.find("ul", {"class": "post-meta"})
+    data_li = [li.text for li in data_ul.find_all("li")][-1]
+    news_report["reading_time"] = [
+        int(num) for num in data_li.split() if num.isdigit()
+    ][0]
+    data_p = soup.find("div", {"class": "entry-content"})
+    news_report["summary"] = formated_str(
+        [p.text for p in data_p.find_all("p")][0]
+    )
+    news_report["category"] = soup.find("span", {"class": "label"}).string
+    return news_report
 
 
 # Requisito 5
