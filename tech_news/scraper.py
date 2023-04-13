@@ -1,5 +1,6 @@
 import requests
 import time
+from bs4 import BeautifulSoup
 
 
 def fetch(url):
@@ -18,7 +19,12 @@ def fetch(url):
 
 
 def scrape_updates(html_content):
-    """Seu código deve vir aqui"""
+    urls = []
+    soup = BeautifulSoup(html_content, "html.parser")
+    cards = soup.find_all("h2", {"class": "entry-title"})
+    for card in cards:
+        urls.append(card.a["href"])
+    return urls
 
 
 # Requisito 3
