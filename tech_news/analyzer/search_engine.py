@@ -2,18 +2,18 @@ from tech_news.database import search_news
 from datetime import datetime
 
 
-def convert_to_tuple(content: list[dict]):
+def convert_to_tuple(content: list[dict]) -> list[tuple]:
     return [(news["title"], news["url"]) for news in content]
 
 
-def search_by_title(title: str):
+def search_by_title(title: str) -> list[tuple]:
     query = {"title": {"$regex": title.lower()}}
     content = search_news(query)
 
     return convert_to_tuple(content)
 
 
-def search_by_date(date):
+def search_by_date(date: str) -> list[tuple]:
     try:
         new_date = datetime.strptime(date, "%Y-%m-%d").strftime("%d/%m/%Y")
         query = {"timestamp": new_date}
@@ -25,6 +25,8 @@ def search_by_date(date):
     return convert_to_tuple(content)
 
 
-# Requisito 9
-def search_by_category(category):
-    """Seu código deve vir aqui"""
+def search_by_category(category: str) -> list[tuple]:
+    query = {"category":  category.capitalize()}
+    content = search_news(query)
+
+    return convert_to_tuple(content)
